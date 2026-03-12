@@ -30,6 +30,8 @@ class SecurityHeadersMiddleware:
 
 
 def _client_identifier(request):
+    if getattr(request, "user", None) and request.user.is_authenticated:
+        return f"user:{request.user.pk}"
     forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
     if forwarded_for:
         return forwarded_for.split(",")[0].strip()

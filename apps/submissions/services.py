@@ -1,6 +1,7 @@
 import subprocess
 import tempfile
 from pathlib import Path
+from collections.abc import Sized
 
 from django.conf import settings
 from django.utils import timezone
@@ -14,6 +15,11 @@ BLOCKED_TOKENS = ["import os", "import sys", "subprocess", "open(", "exec(", "ev
 
 class CodeExecutionDisabledError(Exception):
     pass
+
+
+def normalize_output(value: str) -> str:
+    lines = value.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    return "\n".join(line.rstrip() for line in lines).strip()
 
 
 def validate_code_safety(code: str):
@@ -66,16 +72,46 @@ def execute_python_code(code: str, stdin_data: str):
 
 
 def run_problem_code(user, problem: Problem, code: str, mode: str):
-    cases = problem.test_cases.filter(is_sample=True) if mode == "run" else problem.test_cases.all()
-    total_cases = cases.count()
+    if mode == "run":
+        sample_cases = problem.test_cases.filter(is_sample=True)
+        if sample_cases.exists():
+            cases = sample_cases
+        elif problem.example_input or problem.example_output:
+            cases = [
+                {
+                    "input_data": problem.example_input,
+                    "expected_output": problem.example_output,
+                }
+            ]
+        else:
+            cases = problem.test_cases.all()[:1]
+    else:
+        cases = problem.test_cases.all()
+    total_cases = cases.count() if hasattr(cases, "model") else (len(cases) if isinstance(cases, Sized) else 0)
     passed = 0
     final_output = ""
     final_error = ""
     final_result = "accepted"
 
+    if total_cases == 0:
+        submission = Submission.objects.create(
+            user=user,
+            problem=problem,
+            code=code,
+            mode=mode,
+            result="runtime_error",
+            output="",
+            error_message="No test cases are configured for this problem.",
+            passed_test_cases=0,
+            total_test_cases=0,
+        )
+        return submission
+
     for case in cases:
+        input_data = case.input_data if hasattr(case, "input_data") else case["input_data"]
+        expected_output = case.expected_output if hasattr(case, "expected_output") else case["expected_output"]
         try:
-            execution = execute_python_code(code, case.input_data)
+            execution = execute_python_code(code, input_data)
         except CodeExecutionDisabledError as exc:
             submission = Submission.objects.create(
                 user=user,
@@ -94,9 +130,11 @@ def run_problem_code(user, problem: Problem, code: str, mode: str):
         if execution["result"] != "accepted":
             final_result = execution["result"]
             break
-        if execution["output"].strip() != case.expected_output.strip():
+        normalized_output = normalize_output(execution["output"])
+        normalized_expected = normalize_output(expected_output)
+        if normalized_output != normalized_expected:
             final_result = "wrong_answer"
-            final_error = f"Expected: {case.expected_output.strip()} | Received: {execution['output'].strip() or '[empty]'}"
+            final_error = f"Expected:\n{normalized_expected or '[empty]'}\n\nReceived:\n{normalized_output or '[empty]'}"
             break
         passed += 1
 

@@ -58,11 +58,46 @@ class ProblemWorkspaceView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress, _ = ProblemProgress.objects.get_or_create(user=self.request.user, problem=self.object)
+        next_problem = (
+            Problem.objects.filter(
+                topic=self.object.topic,
+                is_active=True,
+                order__gt=self.object.order,
+            )
+            .order_by("order", "id")
+            .first()
+        )
+        if next_problem is None:
+            next_problem = (
+                Problem.objects.filter(
+                    topic=self.object.topic,
+                    is_active=True,
+                    order=self.object.order,
+                    id__gt=self.object.id,
+                )
+                .order_by("order", "id")
+                .first()
+            )
+        if next_problem is None:
+            next_topic = (
+                Topic.objects.filter(order__gt=self.object.topic.order)
+                .order_by("order", "title")
+                .first()
+            )
+            if next_topic is None:
+                next_topic = (
+                    Topic.objects.filter(order=self.object.topic.order, title__gt=self.object.topic.title)
+                    .order_by("order", "title")
+                    .first()
+                )
+            if next_topic is not None:
+                next_problem = next_topic.problems.filter(is_active=True).order_by("order", "id").first()
         context.update(
             {
                 "progress": progress,
                 "sample_test": self.object.test_cases.filter(is_sample=True).first(),
                 "all_topics": Topic.objects.all(),
+                "next_problem": next_problem,
             }
         )
         return context

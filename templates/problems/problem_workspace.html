@@ -48,11 +48,20 @@
         <div class="console-panel mt-3">
             <div class="console-header">
                 <span>Execution result</span>
-                <span>{{ progress.attempts }} attempts</span>
+                <span id="attempt-count">{{ progress.attempts }} attempts</span>
             </div>
             <div id="result-badge" class="result-badge neutral">Waiting for code execution</div>
             <pre id="console-output" class="console-output">{% if sample_test %}Sample input:
 {{ sample_test.input_data }}{% endif %}</pre>
+            {% if next_problem %}
+                <a
+                    id="next-problem-btn"
+                    href="{% url 'problem-workspace' next_problem.slug %}"
+                    class="btn btn-success mt-3 d-none"
+                >
+                    Next
+                </a>
+            {% endif %}
         </div>
     </div>
 </section>

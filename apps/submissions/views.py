@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 
-from apps.problems.models import Problem
+from apps.problems.models import Problem, ProblemProgress
 from config.security import ratelimit
 
 from .services import run_problem_code
@@ -25,6 +25,7 @@ def run_code_view(request, slug):
     problem = get_object_or_404(Problem, slug=slug)
     payload = _parse_payload(request)
     submission = run_problem_code(request.user, problem, payload.get("code", ""), "run")
+    progress = ProblemProgress.objects.filter(user=request.user, problem=problem).first()
     return JsonResponse(
         {
             "result": submission.get_result_display(),
@@ -32,6 +33,7 @@ def run_code_view(request, slug):
             "error": submission.error_message,
             "passed": submission.passed_test_cases,
             "total": submission.total_test_cases,
+            "attempts": progress.attempts if progress else 0,
         }
     )
 
@@ -43,6 +45,7 @@ def submit_code_view(request, slug):
     problem = get_object_or_404(Problem, slug=slug)
     payload = _parse_payload(request)
     submission = run_problem_code(request.user, problem, payload.get("code", ""), "submit")
+    progress = ProblemProgress.objects.filter(user=request.user, problem=problem).first()
     return JsonResponse(
         {
             "result": submission.get_result_display(),
@@ -50,5 +53,6 @@ def submit_code_view(request, slug):
             "error": submission.error_message,
             "passed": submission.passed_test_cases,
             "total": submission.total_test_cases,
+            "attempts": progress.attempts if progress else 0,
         }
     )
