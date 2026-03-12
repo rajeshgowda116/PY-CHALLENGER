@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ problem.title }} | PY Challenger{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+{% endblock %}
+{% block content %}
+<section class="workspace-grid">
+    <div class="workspace-left glass-card">
+        <span class="eyebrow">STEP 5</span>
+        <h1 class="display-title">{{ problem.title }}</h1>
+        <div class="meta-row mb-3">
+            <span class="topic-pill">{{ problem.topic.title }}</span>
+            <span class="difficulty-badge difficulty-{{ problem.difficulty }}">{{ problem.get_difficulty_display }}</span>
+            <span class="topic-meta">{{ progress.last_result|default:'Ready to solve' }}</span>
+        </div>
+        <p>{{ problem.description }}</p>
+        {% if problem.instructions %}
+            <div class="instruction-box">
+                <h5>Instructions</h5>
+                <p class="mb-0">{{ problem.instructions }}</p>
+            </div>
+        {% endif %}
+        <div class="example-grid">
+            <div class="example-card">
+                <h6>Example Input</h6>
+                <pre>{{ problem.example_input }}</pre>
+            </div>
+            <div class="example-card">
+                <h6>Example Output</h6>
+                <pre>{{ problem.example_output }}</pre>
+            </div>
+        </div>
+    </div>
+    <div class="workspace-right glass-card">
+        <div class="editor-toolbar">
+            <div>
+                <span class="eyebrow">STEP 6</span>
+                <h4 class="mb-0">Editor</h4>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="run-code-btn" class="btn btn-outline-light">Run Code</button>
+                <button id="submit-code-btn" class="btn btn-primary">Submit Code</button>
+            </div>
+        </div>
+        <div id="editor" class="editor-surface"></div>
+        <textarea id="starter-code" class="d-none">{{ progress.last_submitted_code|default:problem.starter_code }}</textarea>
+        <div class="console-panel mt-3">
+            <div class="console-header">
+                <span>Execution result</span>
+                <span>{{ progress.attempts }} attempts</span>
+            </div>
+            <div id="result-badge" class="result-badge neutral">Waiting for code execution</div>
+            <pre id="console-output" class="console-output">{% if sample_test %}Sample input:
+{{ sample_test.input_data }}{% endif %}</pre>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+    window.editorConfig = {
+        runUrl: "{% url 'run-code' problem.slug %}",
+        submitUrl: "{% url 'submit-code' problem.slug %}",
+        csrfToken: "{{ csrf_token }}",
+        starterCode: document.getElementById("starter-code").value
+    };
+</script>
+<script src="{% static 'js/editor.js' %}"></script>
+{% endblock %}

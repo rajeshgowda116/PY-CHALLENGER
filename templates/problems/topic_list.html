@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ topic.title }} | PY Challenger{% endblock %}
+{% block content %}
+<section class="section-card glass-card mb-4">
+    <span class="eyebrow">STEP 4</span>
+    <h1 class="display-title">{{ topic.title }}</h1>
+    <p class="lead-copy">{{ topic.description }}</p>
+    <form method="get" class="row g-3 mt-2">
+        <div class="col-md-7">
+            <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-lg" placeholder="Search problems">
+        </div>
+        <div class="col-md-3">
+            <select name="difficulty" class="form-select form-select-lg">
+                <option value="">All difficulty</option>
+                <option value="easy" {% if selected_difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                <option value="medium" {% if selected_difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="hard" {% if selected_difficulty == 'hard' %}selected{% endif %}>Hard</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary btn-lg w-100" type="submit">Filter</button>
+        </div>
+    </form>
+</section>
+
+<section class="section-card glass-card">
+    <div class="table-responsive">
+        <table class="table challenge-table align-middle">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Difficulty</th>
+                    <th>Status</th>
+                    <th>Attempts</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in problem_rows %}
+                    <tr>
+                        <td>{{ row.problem.title }}</td>
+                        <td><span class="difficulty-badge difficulty-{{ row.problem.difficulty }}">{{ row.problem.get_difficulty_display }}</span></td>
+                        <td>{{ row.status }}</td>
+                        <td>{{ row.attempts }}</td>
+                        <td class="text-end"><a href="{% url 'problem-workspace' row.problem.slug %}" class="btn btn-outline-primary">Solve</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-5">No problems match the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

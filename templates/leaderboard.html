@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Leaderboard | PY Challenger{% endblock %}
+{% block content %}
+<section class="section-card glass-card">
+    <span class="eyebrow">EXTRA FEATURE</span>
+    <h1 class="display-title mb-3">Leaderboard</h1>
+    <div class="table-responsive">
+        <table class="table align-middle leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>User</th>
+                    <th>Solved</th>
+                    <th>Current Streak</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ranked_user in users %}
+                    <tr>
+                        <td>#{{ forloop.counter }}</td>
+                        <td>{{ ranked_user.username }}</td>
+                        <td>{{ ranked_user.solved_total }}</td>
+                        <td>{{ ranked_user.profile.current_streak }}</td>
+                        <td>{{ ranked_user.profile.total_points }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">No ranking data yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

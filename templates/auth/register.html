@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Register | PY Challenger{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+    <div class="auth-card glass-card wide-card">
+        <div class="mb-4">
+            <span class="eyebrow">STEP 1</span>
+            <h1 class="display-title">Create your account.</h1>
+            <p class="text-muted">Start tracking solved problems, streaks, and daily coding progress.</p>
+        </div>
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="col-12">
+                    <div class="alert alert-danger mb-0">{{ form.non_field_errors }}</div>
+                </div>
+            {% endif %}
+            {% for field in form %}
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-2">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-lg w-100">Create account</button>
+            </div>
+        </form>
+        <p class="mt-4 mb-0 text-muted">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+    <div class="auth-hero">
+        <div class="hero-badge">Track your growth</div>
+        <h2>Create an account once, then keep your streak, solved count, and leaderboard ranking in one place.</h2>
+    </div>
+</section>
+{% endblock %}

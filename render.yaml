@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: py-challenger-web
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    autoDeploy: true
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: py-challenger-web
+          property: host
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: https://py-challenger-web.onrender.com
+      - key: DJANGO_LOG_LEVEL
+        value: INFO
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: py-challenger-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: py-challenger-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: py-challenger-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: py-challenger-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: py-challenger-db
+          property: port
+      - key: ENABLE_LOCAL_CODE_EXECUTION
+        value: "False"
+      - key: CODE_EXECUTION_TIME_LIMIT_SECONDS
+        value: "2"
+      - key: MAX_SOURCE_SIZE
+        value: "8000"
+
+databases:
+  - name: py-challenger-db
+    plan: free
