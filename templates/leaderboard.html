@@ -18,11 +18,11 @@
             <tbody>
                 {% for ranked_user in users %}
                     <tr>
-                        <td>#{{ forloop.counter }}</td>
-                        <td>{{ ranked_user.username }}</td>
-                        <td>{{ ranked_user.solved_total }}</td>
-                        <td>{{ ranked_user.profile.current_streak }}</td>
-                        <td>{{ ranked_user.profile.total_points }}</td>
+                        <td style="color:white">#{{ forloop.counter }}</td>
+                        <td style="color:white">{{ ranked_user.username }}</td>
+                        <td style="color:white" >{{ ranked_user.solved_total }}</td>
+                        <td style="color:white">{{ ranked_user.profile.current_streak }}</td>
+                        <td style="color:white">{{ ranked_user.profile.total_points }}</td>
                     </tr>
                 {% empty %}
                     <tr><td colspan="5" class="text-center text-muted">No ranking data yet.</td></tr>

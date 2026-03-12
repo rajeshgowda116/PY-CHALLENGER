@@ -11,10 +11,10 @@
         </div>
         <div class="col-md-3">
             <select name="difficulty" class="form-select form-select-lg">
-                <option value="">All difficulty</option>
-                <option value="easy" {% if selected_difficulty == 'easy' %}selected{% endif %}>Easy</option>
-                <option value="medium" {% if selected_difficulty == 'medium' %}selected{% endif %}>Medium</option>
-                <option value="hard" {% if selected_difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                <option value="" style="color:black">All difficulty</option>
+                <option value="easy" {% if selected_difficulty == 'easy' %}selected{% endif %} style="color:black">Easy</option>
+                <option value="medium" {% if selected_difficulty == 'medium' %}selected{% endif %} style="color:black">Medium</option>
+                <option value="hard" {% if selected_difficulty == 'hard' %}selected{% endif %} style="color:black">Hard</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -38,11 +38,11 @@
             <tbody>
                 {% for row in problem_rows %}
                     <tr>
-                        <td>{{ row.problem.title }}</td>
-                        <td><span class="difficulty-badge difficulty-{{ row.problem.difficulty }}">{{ row.problem.get_difficulty_display }}</span></td>
-                        <td>{{ row.status }}</td>
-                        <td>{{ row.attempts }}</td>
-                        <td class="text-end"><a href="{% url 'problem-workspace' row.problem.slug %}" class="btn btn-outline-primary">Solve</a></td>
+                        <td style="color:white">{{ row.problem.title }}</td>
+                        <td style="color:white"><span class="difficulty-badge difficulty-{{ row.problem.difficulty }}">{{ row.problem.get_difficulty_display }}</span></td>
+                        <td style="color:white">{{ row.status }}</td>
+                        <td style="color:white">{{ row.attempts }}</td>
+                        <td style="color:white" class="text-end"><a href="{% url 'problem-workspace' row.problem.slug %}" class="btn btn-outline-primary">Solve</a></td>
                     </tr>
                 {% empty %}
                     <tr><td colspan="5" class="text-center text-muted py-5">No problems match the selected filters.</td></tr>
