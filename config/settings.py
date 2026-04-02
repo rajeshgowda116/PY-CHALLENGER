@@ -6,6 +6,10 @@ from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def _split_env_list(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "")
 if DEBUG:
@@ -13,10 +17,19 @@ if DEBUG:
 elif not SECRET_KEY:
     raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is False.")
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host.strip()]
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip() for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000").split(",") if origin.strip()
-]
+ALLOWED_HOSTS = _split_env_list(os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost"))
+CSRF_TRUSTED_ORIGINS = _split_env_list(
+    os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000")
+)
+
+render_external_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if render_external_hostname:
+    if render_external_hostname not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_external_hostname)
+
+    render_origin = f"https://{render_external_hostname}"
+    if render_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(render_origin)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
