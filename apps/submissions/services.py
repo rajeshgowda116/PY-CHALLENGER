@@ -92,6 +92,7 @@ def run_problem_code(user, problem: Problem, code: str, mode: str):
     final_output = ""
     final_error = ""
     final_result = "accepted"
+    case_results = []
 
     if total_cases == 0:
         submission = Submission.objects.create(
@@ -105,9 +106,10 @@ def run_problem_code(user, problem: Problem, code: str, mode: str):
             passed_test_cases=0,
             total_test_cases=0,
         )
+        submission.case_results = case_results
         return submission
 
-    for case in cases:
+    for index, case in enumerate(cases, start=1):
         input_data = case.input_data if hasattr(case, "input_data") else case["input_data"]
         expected_output = case.expected_output if hasattr(case, "expected_output") else case["expected_output"]
         try:
@@ -124,19 +126,50 @@ def run_problem_code(user, problem: Problem, code: str, mode: str):
                 passed_test_cases=0,
                 total_test_cases=total_cases,
             )
+            submission.case_results = case_results
             return submission
         final_output = execution["output"]
         final_error = execution["error"]
         if execution["result"] != "accepted":
             final_result = execution["result"]
+            case_results.append(
+                {
+                    "index": index,
+                    "status": execution["result"],
+                    "input": input_data,
+                    "expected": expected_output,
+                    "received": execution["output"],
+                    "error": execution["error"],
+                }
+            )
             break
         normalized_output = normalize_output(execution["output"])
         normalized_expected = normalize_output(expected_output)
         if normalized_output != normalized_expected:
             final_result = "wrong_answer"
             final_error = f"Expected:\n{normalized_expected or '[empty]'}\n\nReceived:\n{normalized_output or '[empty]'}"
+            case_results.append(
+                {
+                    "index": index,
+                    "status": final_result,
+                    "input": input_data,
+                    "expected": expected_output,
+                    "received": execution["output"],
+                    "error": final_error,
+                }
+            )
             break
         passed += 1
+        case_results.append(
+            {
+                "index": index,
+                "status": "accepted",
+                "input": input_data,
+                "expected": expected_output,
+                "received": execution["output"],
+                "error": "",
+            }
+        )
 
     submission = Submission.objects.create(
         user=user,
@@ -163,4 +196,5 @@ def run_problem_code(user, problem: Problem, code: str, mode: str):
         user.profile.register_solve_for_today()
     progress.save()
 
+    submission.case_results = case_results
     return submission

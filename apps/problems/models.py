@@ -30,6 +30,7 @@ class Problem(models.Model):
     description = models.TextField()
     instructions = models.TextField(blank=True)
     starter_code = models.TextField(default="def solve():\n    pass\n")
+    solution = models.TextField(blank=True)
     example_input = models.TextField(blank=True)
     example_output = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)

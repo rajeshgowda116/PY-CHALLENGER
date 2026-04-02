@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+
+{% block title %}Add Problem | PY Challenger{% endblock %}
+
+{% block extra_head %}
+<style>
+    .admin-problem-shell {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 0 3rem;
+    }
+
+    .admin-problem-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+        color: #fff;
+        border-radius: 28px;
+        padding: 2rem;
+        box-shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
+    }
+
+    .admin-problem-panel {
+        background: rgba(11, 21, 38, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.28);
+        color: #eff6ff;
+    }
+
+    .test-case-card {
+        border: 1px solid rgba(82, 182, 255, 0.16);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
+    }
+
+    .test-case-card.is-hidden {
+        display: none;
+    }
+
+    .admin-problem-panel h2,
+    .admin-problem-panel h3,
+    .admin-problem-panel label,
+    .admin-problem-panel .form-label,
+    .admin-problem-panel .h4,
+    .admin-problem-panel .h5 {
+        color: #f8fbff;
+    }
+
+    .admin-problem-panel .text-body-secondary,
+    .admin-problem-panel p {
+        color: #9fb4d0 !important;
+    }
+
+    .admin-problem-panel .badge.text-bg-primary {
+        background: rgba(82, 182, 255, 0.18) !important;
+        color: #d9efff !important;
+        border: 1px solid rgba(82, 182, 255, 0.28);
+    }
+
+    .admin-problem-panel .form-control,
+    .admin-problem-panel .form-select {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #eff6ff;
+    }
+
+    .admin-problem-panel .form-control::placeholder {
+        color: #8ea7c7;
+    }
+
+    .admin-problem-panel .form-control:focus,
+    .admin-problem-panel .form-select:focus {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(82, 182, 255, 0.55);
+        box-shadow: 0 0 0 0.2rem rgba(82, 182, 255, 0.15);
+        color: #ffffff;
+    }
+
+    .admin-problem-panel .form-select option {
+        color: #07111f;
+    }
+
+    #add-test-case-btn {
+        border-color: rgba(82, 182, 255, 0.5);
+        color: #cfe9ff;
+    }
+
+    #add-test-case-btn:hover {
+        background: rgba(82, 182, 255, 0.16);
+        color: #ffffff;
+    }
+
+    .remove-test-case-btn {
+        border-color: rgba(239, 68, 68, 0.45);
+        color: #ffc2c2;
+    }
+
+    .remove-test-case-btn:hover {
+        background: rgba(239, 68, 68, 0.14);
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-problem-shell">
+    <section class="admin-problem-hero mb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-4 align-items-lg-center">
+            <div>
+                <span class="badge rounded-pill text-bg-light text-primary mb-3">Staff Panel</span>
+                <h1 class="display-6 fw-bold mb-2">Add a new coding problem</h1>
+                <p class="mb-0 opacity-75">Create the problem, attach test cases, and publish it directly into the PY Challenger database.</p>
+            </div>
+            <div class="bg-white bg-opacity-10 rounded-4 p-3">
+                <div class="small text-uppercase opacity-75">Access</div>
+                <div class="fs-5 fw-semibold">Admin-only protected page</div>
+            </div>
+        </div>
+    </section>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        {% if form.non_field_errors or formset.non_form_errors %}
+        <div class="alert alert-danger admin-problem-panel mb-4">
+            {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+            {% endfor %}
+            {% for error in formset.non_form_errors %}
+            <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="admin-problem-panel p-4 p-lg-5 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h4 mb-1">Problem details</h2>
+                    <p class="text-body-secondary mb-0">Fill in the full problem metadata, examples, configuration, and authoring fields.</p>
+                </div>
+                <span class="badge text-bg-primary">Required fields validated</span>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label for="{{ form.topic.id_for_label }}" class="form-label fw-semibold">Topic</label>
+                    {{ form.topic }}
+                    {% for error in form.topic.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Title</label>
+                    {{ form.title }}
+                    {% for error in form.title.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.slug.id_for_label }}" class="form-label fw-semibold">Slug</label>
+                    {{ form.slug }}
+                    {% for error in form.slug.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.difficulty.id_for_label }}" class="form-label fw-semibold">Difficulty</label>
+                    {{ form.difficulty }}
+                    {% for error in form.difficulty.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Description</label>
+                    {{ form.description }}
+                    {% for error in form.description.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.instructions.id_for_label }}" class="form-label fw-semibold">Instructions</label>
+                    {{ form.instructions }}
+                    {% for error in form.instructions.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="{{ form.starter_code.id_for_label }}" class="form-label fw-semibold">Starter code</label>
+                    {{ form.starter_code }}
+                    {% for error in form.starter_code.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="{{ form.solution.id_for_label }}" class="form-label fw-semibold">Solution</label>
+                    {{ form.solution }}
+                    {% for error in form.solution.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="{{ form.example_input.id_for_label }}" class="form-label fw-semibold">Example input</label>
+                    {{ form.example_input }}
+                    {% for error in form.example_input.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="{{ form.example_output.id_for_label }}" class="form-label fw-semibold">Example output</label>
+                    {{ form.example_output }}
+                    {% for error in form.example_output.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.order.id_for_label }}" class="form-label fw-semibold">Order</label>
+                    {{ form.order }}
+                    {% for error in form.order.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.points.id_for_label }}" class="form-label fw-semibold">Points</label>
+                    {{ form.points }}
+                    {% for error in form.points.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-4 d-flex flex-column justify-content-end gap-3">
+                    <div class="form-check pt-2">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="form-check-label fw-semibold">Is active</label>
+                    </div>
+                    {% for error in form.is_active.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-check">
+                        {{ form.is_daily_challenge }}
+                        <label for="{{ form.is_daily_challenge.id_for_label }}" class="form-check-label fw-semibold">Is daily challenge</label>
+                    </div>
+                    {% for error in form.is_daily_challenge.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-problem-panel p-4 p-lg-5">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h2 class="h4 mb-1">Test cases</h2>
+                    <p class="text-body-secondary mb-0">Add one or more test cases and control sample status, order, and deletion directly from this page.</p>
+                </div>
+                <button type="button" class="btn btn-outline-primary" id="add-test-case-btn">Add Test Case</button>
+            </div>
+
+            <div id="test-case-list" class="d-grid gap-3">
+                {% for test_form in formset %}
+                <div class="test-case-card p-4" data-form-index="{{ forloop.counter0 }}">
+                    {% for hidden in test_form.hidden_fields %}
+                    {{ hidden }}
+                    {% endfor %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 mb-0">Test Case <span class="test-case-number">{{ forloop.counter }}</span></h3>
+                        {% if formset.can_delete %}
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-test-case-btn">Remove</button>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-lg-5">
+                            <label for="{{ test_form.input_data.id_for_label }}" class="form-label fw-semibold">Input data</label>
+                            {{ test_form.input_data }}
+                            {% for error in test_form.input_data.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-lg-5">
+                            <label for="{{ test_form.expected_output.id_for_label }}" class="form-label fw-semibold">Expected output</label>
+                            {{ test_form.expected_output }}
+                            {% for error in test_form.expected_output.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6 col-lg-1">
+                            <label for="{{ test_form.is_sample.id_for_label }}" class="form-label fw-semibold">Is sample</label>
+                            <div class="form-check pt-2">
+                                {{ test_form.is_sample }}
+                            </div>
+                            {% for error in test_form.is_sample.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6 col-lg-1">
+                            <label for="{{ test_form.order.id_for_label }}" class="form-label fw-semibold">Order</label>
+                            {{ test_form.order }}
+                            {% for error in test_form.order.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if test_form.DELETE %}
+                    <div class="d-none">
+                        {{ test_form.DELETE }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <template id="empty-test-case-template">
+                <div class="test-case-card p-4" data-form-index="__prefix__">
+                    {% for hidden in formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                    {% endfor %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 mb-0">Test Case <span class="test-case-number"></span></h3>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-test-case-btn">Remove</button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-lg-5">
+                            <label for="{{ formset.empty_form.input_data.id_for_label }}" class="form-label fw-semibold">Input data</label>
+                            {{ formset.empty_form.input_data }}
+                        </div>
+                        <div class="col-lg-5">
+                            <label for="{{ formset.empty_form.expected_output.id_for_label }}" class="form-label fw-semibold">Expected output</label>
+                            {{ formset.empty_form.expected_output }}
+                        </div>
+                        <div class="col-md-6 col-lg-1">
+                            <label for="{{ formset.empty_form.is_sample.id_for_label }}" class="form-label fw-semibold">Is sample</label>
+                            <div class="form-check pt-2">
+                                {{ formset.empty_form.is_sample }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-1">
+                            <label for="{{ formset.empty_form.order.id_for_label }}" class="form-label fw-semibold">Order</label>
+                            {{ formset.empty_form.order }}
+                        </div>
+                    </div>
+                    <div class="d-none">
+                        {{ formset.empty_form.DELETE }}
+                    </div>
+                </div>
+            </template>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-3 mt-4">
+                <p class="text-body-secondary mb-0">Problems save immediately to the database after validation passes.</p>
+                <button type="submit" class="btn btn-primary btn-lg px-4">Save Problem</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const totalFormsInput = document.getElementById("id_testcases-TOTAL_FORMS");
+        const testCaseList = document.getElementById("test-case-list");
+        const addButton = document.getElementById("add-test-case-btn");
+        const template = document.getElementById("empty-test-case-template");
+
+        function visibleCards() {
+            return Array.from(testCaseList.querySelectorAll(".test-case-card")).filter(
+                (card) => !card.classList.contains("is-hidden")
+            );
+        }
+
+        function renumberCards() {
+            visibleCards().forEach((card, index) => {
+                const number = card.querySelector(".test-case-number");
+                if (number) {
+                    number.textContent = index + 1;
+                }
+            });
+        }
+
+        function attachRemoveHandler(card) {
+            const removeButton = card.querySelector(".remove-test-case-btn");
+            if (!removeButton) {
+                return;
+            }
+
+            removeButton.addEventListener("click", function () {
+                const deleteCheckbox = card.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                const visibleCount = visibleCards().length;
+                if (visibleCount === 1) {
+                    const firstInput = card.querySelector("textarea");
+                    card.querySelectorAll("textarea").forEach((field) => {
+                        field.value = "";
+                    });
+                    if (deleteCheckbox) {
+                        deleteCheckbox.checked = false;
+                    }
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                    return;
+                }
+
+                if (deleteCheckbox) {
+                    deleteCheckbox.checked = true;
+                    card.classList.add("is-hidden");
+                } else {
+                    card.remove();
+                    totalFormsInput.value = String(parseInt(totalFormsInput.value, 10) - 1);
+                }
+                renumberCards();
+            });
+        }
+
+        addButton.addEventListener("click", function () {
+            const nextIndex = parseInt(totalFormsInput.value, 10);
+            const html = template.innerHTML.replace(/__prefix__/g, nextIndex);
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = html.trim();
+            const newCard = wrapper.firstElementChild;
+            testCaseList.appendChild(newCard);
+            totalFormsInput.value = String(nextIndex + 1);
+            attachRemoveHandler(newCard);
+            renumberCards();
+        });
+
+        testCaseList.querySelectorAll(".test-case-card").forEach(attachRemoveHandler);
+        renumberCards();
+    })();
+</script>
+{% endblock %}
