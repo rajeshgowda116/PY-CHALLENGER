@@ -1,127 +1,166 @@
-# PY Challenger
+# 🚀 PY Challenger
 
-Production-ready Django coding challenge platform with auth, dashboard, topics, submissions, and secure-by-default deployment settings.
+PY Challenger is a Python coding challenge platform designed to help users practice Python from **basic to advanced levels** while tracking their **progress, streaks, and consistency**.
 
-## Production requirements
+---
 
-- Python 3.13
-- PostgreSQL
-- `pip install -r requirements.txt`
-- Environment variables from `.env.example`
+## 🌟 Features
 
-## Important security note
+* 🔐 User Authentication (Login / Register)
+* 📊 Dashboard with:
 
-This project disables local code execution automatically when `DJANGO_DEBUG=False`.
+  * Daily streak 🔥
+  * Problems solved
+  * Coding activity
+* 📚 Topic-wise problem sections:
 
-That is intentional. Running untrusted Python inside the Django web process is not production-safe.
-To deploy public code execution, replace the current runner with an isolated sandbox service or container worker.
+  * Python Basics
+  * Strings
+  * Lists
+  * Loops
+  * Functions
+  * OOP
+* 🧠 Coding Problems:
 
-## Production setup
+  * Beginner → Advanced
+* 🧪 Test Cases support
+* 🖥 Code Editor (for solving problems)
+* 📈 Progress tracking system
+* 🏆 (Optional) Leaderboard
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
+---
+
+## 🛠 Tech Stack
+
+### Backend
+
+* Python
+* Django
+
+### Frontend
+
+* HTML
+* CSS
+* JavaScript
+
+### Database
+
+* SQLite (Development)
+* PostgreSQL (Production)
+
+### Tools
+
+* Monaco Editor (Code Editor)
+* Judge0 API (Code Execution)
+
+---
+
+## 📂 Project Structure
+
+```
+pychallenger/
+│
+├── manage.py
+│
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│
+├── apps/
+│   ├── users/
+│   ├── problems/
+│   ├── submissions/
+│
+├── templates/
+├── static/
+```
+
+---
+
+## ⚙️ Installation
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/pychallenger.git
+cd pychallenger
+```
+
+2. Create virtual environment
+
+```bash
+python -m venv venv
+source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows
+```
+
+3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables using `.env.example`.
-4. Use PostgreSQL in production.
-5. Collect static files:
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-6. Run migrations:
+4. Apply migrations
 
 ```bash
 python manage.py migrate
 ```
 
-7. Start the app with Gunicorn:
+5. Run server
 
 ```bash
-gunicorn config.wsgi:application --bind 0.0.0.0:8000
+python manage.py runserver
 ```
 
-## Health check
+---
 
-Use:
+## 🔑 Admin Access
 
-```text
-/health/
-```
-
-## Render deployment
-
-Render supports Django deployments with a build command, Gunicorn start command, PostgreSQL, and optionally a `render.yaml` Blueprint. I added:
-
-- [render.yaml](c:/Users/rajes/OneDrive/Desktop/Raj/render.yaml)
-- [build.sh](c:/Users/rajes/OneDrive/Desktop/Raj/build.sh)
-- [Procfile](c:/Users/rajes/OneDrive/Desktop/Raj/Procfile)
-
-### Deploy on Render with Blueprint
-
-1. Push this repository to GitHub.
-2. In Render, click `New` -> `Blueprint`.
-3. Connect the repository.
-4. Render will detect [render.yaml](c:/Users/rajes/OneDrive/Desktop/Raj/render.yaml) and create:
-   - one web service
-   - one PostgreSQL database
-5. Review the generated environment variables.
-6. Update `DJANGO_CSRF_TRUSTED_ORIGINS` if your final Render hostname differs from the default in the blueprint.
-7. Deploy.
-
-### Deploy on Render manually
-
-If you do not want to use Blueprint:
-
-- Build command: `./build.sh`
-- Start command: `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
-
-Set these environment variables in Render:
-
-- `DJANGO_DEBUG=False`
-- `DJANGO_SECRET_KEY=<generate a strong secret>`
-- `DJANGO_ALLOWED_HOSTS=<your-render-hostname>`
-- `DJANGO_CSRF_TRUSTED_ORIGINS=https://<your-render-hostname>`
-- `DJANGO_LOG_LEVEL=INFO`
-- `POSTGRES_DB`
-- `POSTGRES_USER`
-- `POSTGRES_PASSWORD`
-- `POSTGRES_HOST`
-- `POSTGRES_PORT`
-- `ENABLE_LOCAL_CODE_EXECUTION=False`
-
-### After first deploy
-
-Open the Render shell and create an admin user:
+Create superuser:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Check health:
+Access admin panel:
 
-```text
-https://<your-render-hostname>/health/
+```
+http://127.0.0.1:8000/admin
 ```
 
-## Recommended reverse proxy
+---
 
-Use Nginx or a managed platform that terminates HTTPS and forwards `X-Forwarded-Proto`.
+## 📌 Future Improvements
 
-## Minimum environment variables
+* AI Hint System 🤖
+* Daily Challenge 🔥
+* Leaderboard 🏆
+* Code execution sandbox (Docker)
+* Multi-language support
 
-- `DJANGO_DEBUG=False`
-- `DJANGO_SECRET_KEY`
-- `DJANGO_ALLOWED_HOSTS`
-- `DJANGO_CSRF_TRUSTED_ORIGINS`
-- `POSTGRES_DB`
-- `POSTGRES_USER`
-- `POSTGRES_PASSWORD`
-- `POSTGRES_HOST`
-- `POSTGRES_PORT`
-- `ENABLE_LOCAL_CODE_EXECUTION=False`
-rajesh gowda
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repo
+2. Create a new branch
+3. Commit changes
+4. Push and create PR
+
+---
+
+## 📜 License
+
+This project is open-source and available under the MIT License.
+
+---
+
+## 💡 Author
+
+Developed by **Rajesh Gouda**
+
+---
+
+⭐ If you like this project, give it a star!
